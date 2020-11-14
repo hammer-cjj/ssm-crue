@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zsga.cf.ssm.dao.EmpDao">
+	<resultMap id="empMap" type="com.zsga.cf.ssm.entity.Emp">
+		<id column="emp_id" property="empId" />
+		<result column="emp_name" property="empName" />
+		<result column="gender" property="gender" />
+		<result column="email" property="email" />
+		<association property="dept" column="dept_id"
+			javaType="com.zsga.cf.ssm.entity.Dept">
+			<id column="dept_id" property="deptId" />
+			<result column="dept_name" property="deptName" />
+		</association>
+	</resultMap>
+	
+	<insert id="insertEmp" parameterType="com.zsga.cf.ssm.entity.Emp"
+		useGeneratedKeys="true" keyProperty="empId" keyColumn="emp_id">
+		INSERT INTO
+		T_EMP(emp_id, emp_name, gender, email, dept_id)
+		VALUES(#{empId}, #{empName}, #{gender}, #{email}, #{dept.deptId})
+	</insert>
+	
+	<select id="queryAllEmp" resultMap="empMap">
+		SELECT e.emp_id, e.emp_name, e.gender, e.email, e.dept_id, d.dept_name FROM T_EMP e
+		LEFT JOIN T_DEPT d ON e.dept_id = d.dept_id
+		<where>
+			<if test="empCondition != null and empCondition.empId != null">
+				and e.emp_id = #{empCondition.empId}
+			</if>
+			<if test="empCondition != null and empCondition.dept != null">
+				and e.dept_id = #{empCondition.dept.deptId}
+			</if>
+		</where>
+	</select>
+</mapper>

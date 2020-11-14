@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zsga.cf.ssm.dao.DeptDao">
+	<resultMap id="deptMap" type="com.zsga.cf.ssm.entity.Dept">
+		<id column="dept_id" property="deptId" />
+		<result column="dept_name" property="deptName" />
+	</resultMap>
+	
+	<insert id="insertDept" parameterType="com.zsga.cf.ssm.entity.Dept"
+		useGeneratedKeys="true" keyProperty="deptId" keyColumn="dept_id">
+		INSERT INTO T_DEPT(dept_name) VALUES(#{deptName})
+	</insert>
+</mapper>
