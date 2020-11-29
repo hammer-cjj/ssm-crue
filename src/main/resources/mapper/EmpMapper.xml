@@ -33,5 +33,6 @@
 				and e.dept_id = #{empCondition.dept.deptId}
 			</if>
 		</where>
+		ORDER BY e.emp_id ASC
 	</select>
 </mapper>

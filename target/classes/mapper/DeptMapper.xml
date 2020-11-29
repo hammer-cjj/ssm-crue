@@ -12,4 +12,8 @@
 		useGeneratedKeys="true" keyProperty="deptId" keyColumn="dept_id">
 		INSERT INTO T_DEPT(dept_name) VALUES(#{deptName})
 	</insert>
+	
+	<select id="queryAllDept" resultType="com.zsga.cf.ssm.entity.Dept">
+		SELECT dept_id, dept_name FROM T_DEPT
+	</select>
 </mapper>

@@ -21,4 +21,10 @@ public class EmpServiceImpl implements EmpService {
 		return empDao.queryAllEmp(empCondition);
 	}
 
+
+	@Override
+	public int saveEmp(Emp emp) {
+		return empDao.insertEmp(emp);
+	}
+
 }

@@ -7,11 +7,17 @@ import org.apache.ibatis.annotations.Param;
 import com.zsga.cf.ssm.entity.Emp;
 
 public interface EmpDao {
-	void insertEmp(Emp emp);
 	/**
 	 * 查询所有员工
 	 * @param empCondition
 	 * @return
 	 */
 	List<Emp> queryAllEmp(@Param("empCondition")Emp empCondition);
+	
+	/**
+	 * 添加员工
+	 * @param emp
+	 * @return
+	 */
+	int insertEmp(Emp emp);
 }
