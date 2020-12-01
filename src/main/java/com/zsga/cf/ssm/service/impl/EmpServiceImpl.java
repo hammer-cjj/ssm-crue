@@ -27,4 +27,10 @@ public class EmpServiceImpl implements EmpService {
 		return empDao.insertEmp(emp);
 	}
 
+
+	@Override
+	public boolean checkUserByName(String empName) {
+		return empDao.queryUserByName(empName) == 0;
+	}
+
 }

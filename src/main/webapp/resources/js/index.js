@@ -3,13 +3,88 @@ $(function(){
 	var totalRecord;
 	to_page(1);
 	
+	function reset_form(ele) {
+		//清除表单数据
+		$(ele)[0].reset();
+		//清空表单样式
+		$(ele).find("*").removeClass("has-error has-success");
+		$(ele).find(".help-block").text("");
+	}
+	
 	//新增按钮弹出模态框
 	$("#emp_add_modal_btn").click(function(){
+		//清除表单
+		reset_form("#empAddModal form");
+		
 		//查询部门信息
 		getDepts();
 		
 		$("#empAddModal").modal({
 			backdrop:"static"
+		});
+	});
+	
+	//员工名字和邮箱校验
+	function validate_add_form() {
+		//正则表达式校验
+		//字符a-z,A-Z,0-9 _ -(6-16位)，中文（2-5个）
+		var empName = $("#empName_add_input").val();
+		var regName = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5}$)/;
+		if (!regName.test(empName)) {
+			//alert("用户名可以是2-5位中文或者是6-16位英文和数字的组合");
+			//$("#empName_add_input").parent().addClass("has-error");
+			//$("#empName_add_input").next("span").text("用户名可以是2-5位中文或者是6-16位英文和数字的组合");
+			show_validate_msg("#empName_add_input", "error", "用户名可以是2-5位中文或者是6-16位英文和数字的组合");
+			return false;
+		} else {
+			//$("#empName_add_input").parent().removeClass("has-error");
+			//$("#empName_add_input").parent().addClass("has-success");
+			//$("#empName_add_input").next("span").text("");
+			show_validate_msg("#empName_add_input", "success", "");
+		}
+		
+		var email = $("#email_add_input").val();
+		var regEmail = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+		if (!regEmail.test(email)) {
+			//alert("邮箱格式不正确");
+			show_validate_msg("#email_add_input", "error", "邮箱格式不正确");
+			return false;
+		} else {
+			show_validate_msg("#email_add_input", "success", "");
+		}
+		
+		return true;
+	}
+	
+	//显示校验信息
+	function show_validate_msg(ele, status, msg) {
+		//清楚状态
+		$(ele).parent().removeClass("has-success has-error");
+		$(ele).next("span").text("");
+		if ("success" == status) {
+			$(ele).parent().addClass("has-success");
+			$(ele).next("span").text(msg);
+		} else if ("error") {
+			$(ele).parent().addClass("has-error");
+			$(ele).next("span").text(msg);
+		}
+	}
+	
+	//校验用户名是否已存在
+	$("#empName_add_input").change(function(){
+		$.ajax({
+			url: "/ssm-crud/checkuser",
+			data: "empName="+this.value,
+			type: "post",
+			success: function(result) {
+				if (result.code == 100) {
+					show_validate_msg("#empName_add_input", "success", "用户名可用");
+					$("emp_save_btn").attr("ajax-va", "success");
+				} else {
+					show_validate_msg("#empName_add_input", "error", result.extend.va_msg);
+					$("emp_save_btn").attr("ajax-va", "error");
+				}
+			}
 		});
 	});
 	
@@ -26,6 +101,17 @@ $(function(){
 				deptId: $("#dept_add_select option:selected").val()
 		};
 		//console.log(emp);
+		
+		//数据校验
+		if (!validate_add_form()) {
+			return false;
+		}
+		
+		//校验用户名是否已存在
+		if ($(this).attr("ajax-va") == "error") {
+			return false;
+		}
+		
 		$.ajax({
 			url: "/ssm-crud/emps",
 			type: "post",
@@ -40,6 +126,19 @@ $(function(){
 					//2. 显示最后一页
 					//跳转到一个大于总页数的数值，总记录数肯定大于总页数
 					to_page(totalRecord);
+				} else {
+					//console.log(result);
+					//显示错误信息
+					if (result.extend.errorFields.email != undefined) {
+						//显示邮箱错误信息
+						show_validate_msg("#email_add_input", "error", result.extend.errorFields.email);
+					}
+					
+					if (result.extend.errorFields.empName != undefined) {
+						//显示员工的错误信息
+						show_validate_msg("#empName_add_input", "error", result.extend.errorFields.empName);
+					}
+					
 				}
 			}
 		});

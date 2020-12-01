@@ -1,10 +1,16 @@
 package com.zsga.cf.ssm.web;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,20 +30,51 @@ public class EmpController {
 	private EmpService empService;
 	
 	/**
+	 * 检查用户名是否已存在
+	 * @param empName
+	 * @return
+	 */
+	@RequestMapping("/checkuser")
+	@ResponseBody
+	public Msg checkUser(@RequestParam("empName")String empName) {
+		//先判断用户名是否合法
+		String regx = "(^[a-zA-Z0-9_-]{6,16}$)|(^[\\u2E80-\\u9FFF]{2,5}$)";
+		if (!empName.matches(regx)) {
+			return Msg.fail().add("va_msg", "用户名必须是2-5位中文或者是6-16位英文和数字的组合");
+		}
+		//数据库校验
+		boolean b = empService.checkUserByName(empName);
+		if (b) {
+			return Msg.success();
+		} else {
+			return Msg.fail().add("va_msg", "用户名已存在");
+		}
+	}
+	
+	/**
 	 * 员工保存
 	 * @param emp
 	 * @return
 	 */
 	@RequestMapping(value="/emps", method = RequestMethod.POST)
 	@ResponseBody
-	public Msg saveEmp(@RequestBody Emp emp) {
-		int result = empService.saveEmp(emp);
-		if (result > 0) {
-			return Msg.success();
+	public Msg saveEmp(@Valid @RequestBody Emp emp, BindingResult result) {
+		if (result.hasErrors()) {
+			//校验失败
+			Map<String, Object> map = new HashMap<>();
+			List<FieldError> errors =  result.getFieldErrors();
+			for (FieldError fieldError : errors) {
+				map.put(fieldError.getField(), fieldError.getDefaultMessage());
+			}
+			return Msg.fail().add("errorFields", map);
 		} else {
-			return Msg.fail();
+			int code = empService.saveEmp(emp);
+			if (code > 0) {
+				return Msg.success();
+			} else {
+				return Msg.fail();
+			}
 		}
-		
 	}
 	
 	@RequestMapping(value="/emps", method=RequestMethod.GET)

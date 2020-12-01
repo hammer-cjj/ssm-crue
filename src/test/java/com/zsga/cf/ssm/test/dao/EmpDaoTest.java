@@ -50,4 +50,11 @@ public class EmpDaoTest extends BaseTest {
 		List<Emp> empList = empDao.queryAllEmp(emp);
 		Assert.assertEquals(empList.size(), 1);
 	}
+	
+	@Test
+	public void testQueryUserByName() {
+		String empName = "cf";
+		int count = empDao.queryUserByName(empName);
+		Assert.assertEquals(1, count);
+	}
 }

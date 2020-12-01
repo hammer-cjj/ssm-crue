@@ -35,4 +35,8 @@
 		</where>
 		ORDER BY e.emp_id ASC
 	</select>
+	
+	<select id="queryUserByName" parameterType="String" resultType="Integer">
+		SELECT COUNT(emp_name) FROM T_EMP WHERE emp_name = #{empName}
+	</select>
 </mapper>
