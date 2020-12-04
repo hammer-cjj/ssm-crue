@@ -1,5 +1,6 @@
 package com.zsga.cf.ssm.web;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,6 +30,57 @@ public class EmpController {
 	
 	@Autowired
 	private EmpService empService;
+	
+	/**
+	 * 删除员工
+	 * 批量删除：1-2-3
+	 * 单个删除：1
+	 * @param empId
+	 * @return
+	 */
+	@RequestMapping(value="/emps/{empIds}", method=RequestMethod.DELETE)
+	@ResponseBody
+	public Msg removeEmpById(@PathVariable("empIds")String empIds) {
+		
+		if (empIds.contains("-")) { //批量删除
+			List<Integer> del_empIds = new ArrayList<>();
+			String[] str_empIds = empIds.split("-");
+			for (String s : str_empIds) {
+				del_empIds.add(Integer.parseInt(s));
+			}
+			empService.removeEmpBatch(del_empIds);
+		} else { //单个删除
+			Integer empId = Integer.parseInt(empIds);
+			empService.removeEmp(empId);
+		}
+		
+		return Msg.success();
+	}
+	
+	/**
+	 * 更新员工信息
+	 * @param emp
+	 * @return
+	 */
+	@RequestMapping(value="/emps/{empId}", method=RequestMethod.PUT)
+	@ResponseBody
+	public Msg saveEmp(@RequestBody Emp emp) {
+		System.out.println(emp);
+		empService.editEmp(emp);
+		return Msg.success();
+	}
+		
+	/**
+	 * 根据员工ID查询员工信息
+	 * @param empId
+	 * @return
+	 */
+	@RequestMapping(value="/emps/{empId}", method = RequestMethod.GET)
+	@ResponseBody
+	public Msg getEmp(@PathVariable("empId")Integer empId) {
+		Emp emp = empService.getEmp(empId);
+		return Msg.success().add("emp", emp);
+	}
 	
 	/**
 	 * 检查用户名是否已存在

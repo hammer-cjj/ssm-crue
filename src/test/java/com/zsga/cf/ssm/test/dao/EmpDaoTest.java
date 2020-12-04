@@ -1,5 +1,6 @@
 package com.zsga.cf.ssm.test.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,5 +57,39 @@ public class EmpDaoTest extends BaseTest {
 		String empName = "cf";
 		int count = empDao.queryUserByName(empName);
 		Assert.assertEquals(1, count);
+	}
+	
+	@Test
+	public void testQueryEmpById() {
+		int empId = 1003;
+		Emp emp = empDao.queryEmpById(empId);
+		System.out.println(emp.getEmpName());
+		System.out.println(emp.getDept().getDeptId());
+		System.out.println(emp.getDept().getDeptName());
+	}
+	
+	@Test
+	public void testUpdateEmp() {
+		Emp emp = new Emp();
+		emp.setEmpId(1003);
+		emp.setGender("F");
+		Dept dept = new Dept();
+		dept.setDeptId(2);
+		emp.setDept(dept);
+		empDao.updateEmp(emp);
+	}
+	
+	@Test
+	public void testDeleteEmpById() {
+		int empId = 1003;
+		empDao.deleteEmpById(empId);
+	}
+	
+	@Test
+	public void testDeleteEmpBatch() {
+		List<Integer> empIds = new ArrayList<>();
+		empIds.add(2);
+		empIds.add(3);
+		empDao.deleteEmpBatch(empIds);
 	}
 }

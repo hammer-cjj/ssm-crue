@@ -27,4 +27,28 @@ public interface EmpDao {
 	 * @return
 	 */
 	int queryUserByName(String empName);
+
+	/**
+	 * 根据员工ID查询员工信息
+	 * @param empId
+	 * @return
+	 */
+	Emp queryEmpById(Integer empId);
+
+	/**
+	 * 更新员工信息
+	 * @param emp
+	 */
+	void updateEmp(Emp emp);
+
+	/**
+	 * 删除员工
+	 * @param empId
+	 */
+	void deleteEmpById(Integer empId);
+
+	/*
+	 * 批量删除员工
+	 */
+	void deleteEmpBatch(List<Integer> del_empIds);
 }

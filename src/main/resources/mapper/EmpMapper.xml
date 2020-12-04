@@ -39,4 +39,35 @@
 	<select id="queryUserByName" parameterType="String" resultType="Integer">
 		SELECT COUNT(emp_name) FROM T_EMP WHERE emp_name = #{empName}
 	</select>
+	
+	<select id="queryEmpById" parameterType="Integer" resultMap="empMap">
+		SELECT a.*, b.dept_name FROM T_EMP a LEFT JOIN T_DEPT b on a.dept_id = b.dept_id 
+		WHERE a.emp_id  = #{empId}
+	</select>
+	
+	<update id="updateEmp" parameterType="Emp" keyProperty="emp_id" useGeneratedKeys="true">
+		UPDATE T_EMP
+		<set>
+			<if test="email != null">email = #{email},</if>
+			<if test="gender != null">gender = #{gender},</if>
+			<if test="dept != null and dept.deptId != null">dept_id = #{dept.deptId},</if>
+		</set>
+		WHERE emp_id = #{empId}
+	</update>
+	
+	<delete id="deleteEmpById" parameterType="Integer">
+		DELETE FROM T_EMP WHERE emp_id = #{empId}
+	</delete>
+	
+	<delete id="deleteEmpBatch">
+		DELETE FROM T_EMP
+		<where>
+			<if test="list != null and list.size > 0">
+				AND emp_id IN
+				<foreach item="item" index="index" collection="list" open="("  close=")" separator=",">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</delete>
 </mapper>

@@ -58,4 +58,10 @@ public class Emp {
 		this.dept = dept;
 	}
 
+	@Override
+	public String toString() {
+		return "Emp [empId=" + empId + ", empName=" + empName + ", gender=" + gender + ", email=" + email + ", dept="
+				+ dept + "]";
+	}
+	
 }

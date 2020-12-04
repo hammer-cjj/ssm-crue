@@ -33,4 +33,28 @@ public class EmpServiceImpl implements EmpService {
 		return empDao.queryUserByName(empName) == 0;
 	}
 
+
+	@Override
+	public Emp getEmp(Integer empId) {
+		return empDao.queryEmpById(empId);
+	}
+
+
+	@Override
+	public void editEmp(Emp emp) {
+		empDao.updateEmp(emp);
+	}
+
+
+	@Override
+	public void removeEmp(Integer empId) {
+		empDao.deleteEmpById(empId);
+	}
+
+
+	@Override
+	public void removeEmpBatch(List<Integer> del_empIds) {
+		empDao.deleteEmpBatch(del_empIds);
+	}
+
 }
