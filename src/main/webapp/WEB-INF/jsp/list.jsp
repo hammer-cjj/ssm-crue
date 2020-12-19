@@ -45,7 +45,7 @@
 			 		<tr>
 			 			<td>${emp.empId }</td>
 			 			<td>${emp.empName }</td>
-			 			<td>${emp.gender == "M" ? "男" : "女" }</td>
+			 			<td>>${emp.gender == "M" ? "男" : "女" }</td>
 			 			<td>${emp.email }</td>
 			 			<td>${emp.dept.deptName }</td>
 			 			<td>

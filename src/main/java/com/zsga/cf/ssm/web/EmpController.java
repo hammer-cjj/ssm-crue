@@ -1,10 +1,15 @@
 package com.zsga.cf.ssm.web;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +25,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.excel.EasyExcel;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zsga.cf.ssm.entity.Emp;
+import com.zsga.cf.ssm.entity.ExcelEmp;
 import com.zsga.cf.ssm.entity.Msg;
 import com.zsga.cf.ssm.service.EmpService;
 
@@ -30,6 +39,48 @@ public class EmpController {
 	
 	@Autowired
 	private EmpService empService;
+	
+	@GetMapping("/excelexport")
+	public void excelExport(HttpServletResponse response) throws IOException{
+		try {
+			response.setContentType("application/vnd.ms-excel");
+            response.setCharacterEncoding("utf-8");
+            // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
+            String fileName = URLEncoder.encode("员工表", "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+            
+            //获取数据
+            List<Emp> empList = empService.getAllEmp(null); 
+            //转换成需要导出的内容
+            List<ExcelEmp> excels = new ArrayList<>();
+            
+            for (int i=0; i<empList.size(); i++) {
+            	Emp e = empList.get(i);
+            	ExcelEmp ee = new ExcelEmp();
+            	ee.setEmpId(e.getEmpId());
+            	ee.setEmpName(e.getEmpName());
+            	ee.setGender(e.getGender().equals("M")?"男":"女");
+            	ee.setDeptName(e.getDept().getDeptName());
+            	ee.setEmail(e.getEmail());
+            	excels.add(ee);
+            }
+            
+            // 这里需要设置不关闭流
+            EasyExcel.write(response.getOutputStream(), ExcelEmp.class).autoCloseStream(Boolean.FALSE).sheet("员工列表")
+                .doWrite(excels);
+		} catch(Exception e) {
+			// 重置response
+            response.reset();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("status", "failure");
+            map.put("message", "下载文件失败" + e.getMessage());
+            ObjectMapper objectMapper = new ObjectMapper();
+            response.getWriter().println(objectMapper.writeValueAsString(map));
+		}
+	}
+	
 	
 	/**
 	 * 删除员工
@@ -144,7 +195,7 @@ public class EmpController {
 	 * 查询员工数据（PageHelper分页查询）
 	 * @return
 	 */
-	//@RequestMapping(value="/emps", method=RequestMethod.GET)
+	@RequestMapping(value="/emps2", method=RequestMethod.GET)
 	public String getEmps(@RequestParam(value="pn", defaultValue="1")Integer pn, Model model) {
 		PageHelper.startPage(pn, 10);
 		List<Emp> empList = empService.getAllEmp(null); 
@@ -153,4 +204,5 @@ public class EmpController {
 		model.addAttribute("pageInfo", page);
 		return "list";
 	}
+	
 }

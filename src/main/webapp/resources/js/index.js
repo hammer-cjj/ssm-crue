@@ -411,4 +411,16 @@ $(function(){
 		}
 	});
 	
+/*************************导出员工*******************************/
+	$("#emp_export_btn").click(function(){
+		location.href="/ssm-crud/excelexport";
+		//window.open("/ssm-crud/excelexport");
+	});
+	
+/***************************打印********************************/
+	$("#emp_print_btn").click(function(){
+		$("#emps_table").jqprint();
+		//printJS('container', 'html');
+	});
+	
 });	
