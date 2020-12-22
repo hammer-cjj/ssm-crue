@@ -419,8 +419,17 @@ $(function(){
 	
 /***************************打印********************************/
 	$("#emp_print_btn").click(function(){
-		$("#emps_table").jqprint();
-		//printJS('container', 'html');
+		//$("#emps_table").jqprint();
+		printJS({
+			printable: 'emps_table',
+			type: 'html',
+			//targetStyles: ['*'],
+			css: ["http://localhost:8080/ssm-crud/resources/bootstrap-3.3.7-dist/css/bootstrap.min.css"],
+	        scanStyles: false,
+			style: 'table,table tr th, table tr td {border:1px solid #666;}' +
+					'table {border-collapse: collapse; padding:2px;}'
+			
+		});
 	});
 	
 });	
